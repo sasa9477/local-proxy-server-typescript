@@ -90,3 +90,10 @@ typings/
 
 # Electron-Forge
 out/
+
+# local history
+.history/
+
+# mkcert dev certs
+localhost-key.pem
+localhost.pem
