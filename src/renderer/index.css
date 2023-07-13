@@ -109,7 +109,6 @@ button:hover:not(:disabled) {
 .target-list-container {
   position: relative;
   width: 100%;
-  display: none;
 }
 
 .toggle-target-list-button {
