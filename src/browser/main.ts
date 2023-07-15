@@ -39,6 +39,8 @@ const createWindow = (): void => {
     if (!app.isPackaged) {
       // Open dev tools
       win?.webContents.openDevTools()
+
+      console.log('electorn-store path: ', app.getPath('userData'))
     }
   })
 }

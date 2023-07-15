@@ -1,11 +1,3 @@
-type ServerStatus = {
-  isRunning: boolean
-  targetUrl: string
-  serverUrl: string
-  enableWs: boolean
-  qrCode: string
-}
-
 type Setting = {
   targetUrls: Array<string>
   listenHosts: Array<string>
@@ -21,6 +13,7 @@ type StartProxyServerArgs = Omit<Setting, 'targetUrls' | 'listenHosts'> & {
 
 interface Window {
   electronAPI: {
+    getHostIpAddress: () => Promise<string[]>
     loadSetting: () => Promise<Setting>
     startProxyServer: (args: StartProxyServerArgs) => Promise<ServerStatus>
     stopProxyServer: () => Promise<ServerStatus>

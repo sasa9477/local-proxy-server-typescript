@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react'
 import QRCode from 'qrcode'
 
-export const useQrCode = () => {
-  const [qrCode, setQrCode] = useState('')
+export const useQrCode = (defaultValue?: string) => {
+  const [qrCode, setQrCode] = useState(defaultValue ?? '')
 
   const convertQrCode = useCallback(async (serverUrl: string) => {
     const qrCodeImage = await QRCode.toDataURL(serverUrl, {

@@ -173,12 +173,12 @@ button:hover:not(:disabled) {
   white-space: pre-wrap;
 }
 
-.server-status[class*='error'] {
-  color: #ff0000;
-}
-
 .server-url-qrcode {
   display: block;
+}
+
+.error-text {
+  color: #ff0000;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -11,7 +11,7 @@ const schema: Store.Schema<Setting> = {
   },
   listenHosts: {
     type: 'array',
-    default: ['192.168.0.2', '192.168.0.3'],
+    default: [],
   },
   listenPort: {
     type: 'number',

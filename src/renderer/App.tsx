@@ -1,4 +1,4 @@
-import { SyntheticEvent, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import './index.css'
 import { useQrCode } from './hooks/useQrCode'
@@ -15,8 +15,8 @@ function App() {
   const [running, setRunning] = useState(false)
   const [showTargetUrls, setShowTargetUrls] = useState(false)
   const [showListenHost, setShowListenHost] = useState(false)
-  const [targetUrls, setTargetUrls] = useState(['https://localhost:3000/', 'http://localhost:3000/'])
-  const [listenHosts, setListenHosts] = useState(['192.168.0.2'])
+  const [targetUrls, setTargetUrls] = useState<string[]>([])
+  const [listenHosts, setListenHosts] = useState<string[]>([])
   const { qrCode, convertQrCode } = useQrCode()
 
   const serverStatus = useMemo(() => {
@@ -75,6 +75,14 @@ function App() {
   const onListenHostListClick = useCallback((event: SyntheticEvent<HTMLLIElement>) => {
     const element = event.target as HTMLLIElement
     setValue('listenHost', element.innerText)
+  }, [])
+
+  useEffect(() => {
+    const load = async () => {
+      const ipAddress = await window.electronAPI.getHostIpAddress()
+      setListenHosts((listenHosts) => [...ipAddress, ...listenHosts])
+    }
+    load()
   }, [])
 
   return (
@@ -155,9 +163,9 @@ function App() {
       <div className='server-status-container'>
         <div className='server-status'>
           <p>{serverStatus}</p>
-          {errors.targetUrl && <p>ターゲットURLを入力してください</p>}
-          {errors.listenHost && <p>ホスト名を入力してください</p>}
-          {errors.listenPort && <p>ポートが無効な値です</p>}
+          {errors.targetUrl && <p className='error-text'>ターゲットURLを入力してください</p>}
+          {errors.listenHost && <p className='error-text'>ホスト名を入力してください</p>}
+          {errors.listenPort && <p className='error-text'>ポート番号が無効な値です</p>}
         </div>
         <img className='server-url-qrcode' src={qrCode} />
       </div>
