@@ -1,5 +1,5 @@
-import { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, SubmitHandler, set } from 'react-hook-form'
+import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { useQrCode } from './hooks/useQrCode'
 import './index.css'
 
