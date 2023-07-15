@@ -6,7 +6,7 @@ wsl で実行したサーバーを スマートフォンの実機で確認する
 wsl2 の環境にポートフォワードする方法がありますが、うまくいかなかったために作成しました。  
 https://learn.microsoft.com/ja-jp/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan
 
-<img src="https://user-images.githubusercontent.com/74425572/229345104-9440b2f7-49ba-4cd6-bfb2-2d728ca49a3e.png"/>
+<img src="https://github.com/sasa9477/local-proxy-server-typescript/assets/74425572/a5327464-6077-4d17-b748-35814787bf49"/>
 
 ### 構築手順
 
