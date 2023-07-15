@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { SyntheticEvent, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import './index.css'
+import { useQrCode } from './hooks/useQrCode'
 
 type Inputs = {
   targetUrl: string
@@ -13,25 +14,41 @@ type Inputs = {
 function App() {
   const [running, setRunning] = useState(false)
   const [showTargetUrls, setShowTargetUrls] = useState(false)
-  const [qrCodeSrc, setQrCodeSrc] = useState('')
+  const [showListenHost, setShowListenHost] = useState(false)
+  const [targetUrls, setTargetUrls] = useState(['https://localhost:3000/', 'http://localhost:3000/'])
+  const [listenHosts, setListenHosts] = useState(['192.168.0.2'])
+  const { qrCode, convertQrCode } = useQrCode()
 
-  const [setting, setSetting] = useState<Setting>({
-    targetUrls: ['https://localhost:3000/', 'http://localhost:3000/'],
-    listenHosts: ['192.168.0.2', '192.168.0.3'],
-    listenPort: 8888,
-    enableHttps: false,
-    enableWs: false,
-  })
+  const serverStatus = useMemo(() => {
+    return running ? 'Server Running' : 'Server Stopped'
+  }, [])
 
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>()
+  } = useForm<Inputs>({
+    defaultValues: async () => {
+      const setting = await window.electronAPI.loadSetting()
+      setTargetUrls(setting.targetUrls)
+      setListenHosts(setting.listenHosts)
+      return {
+        targetUrl: setting.targetUrls[0],
+        listenHost: setting.listenHosts[0],
+        listenPort: setting.listenPort,
+        enableHttps: setting.enableHttps,
+        enableWs: setting.enableWs,
+      }
+    },
+  })
 
   const onSubmit = useCallback<SubmitHandler<Inputs>>(async (data) => {
     console.log(data)
+    console.log(errors)
     await window.electronAPI.startProxyServer(data)
+    const serverUrl = `${data.enableHttps ? 'https' : 'http'}://${data.listenHost}:${data.listenPort}`
+    convertQrCode(serverUrl)
     setRunning(true)
   }, [])
 
@@ -42,55 +59,78 @@ function App() {
 
   const onToggleTargetListButtonClick = useCallback(() => {
     setShowTargetUrls((showTargetUrls) => !showTargetUrls)
+    setShowListenHost(false)
   }, [])
 
-  useEffect(() => {
-    const initSetting = async () => {
-      const setting = await window.electronAPI.loadSetting()
-      setSetting(setting)
-    }
-    initSetting()
+  const onTargetUrlListClick = useCallback((event: SyntheticEvent<HTMLLIElement>) => {
+    const element = event.target as HTMLLIElement
+    setValue('targetUrl', element.innerText)
+  }, [])
+
+  const onToggleListenHostListButtonClick = useCallback(() => {
+    setShowListenHost((showListenHost) => !showListenHost)
+    setShowTargetUrls(false)
+  }, [])
+
+  const onListenHostListClick = useCallback((event: SyntheticEvent<HTMLLIElement>) => {
+    const element = event.target as HTMLLIElement
+    setValue('listenHost', element.innerText)
   }, [])
 
   return (
     <main className='main'>
       <form className='form' onSubmit={handleSubmit(onSubmit)}>
         <div className='input-area'>
-          <label htmlFor='target-url'>Target URL :</label>
+          <label htmlFor='targetUrl'>Target URL :</label>
           <div className='target-url-container'>
-            <input
-              type='text'
-              name='target-url'
-              {...register('targetUrl')}
-              defaultValue={setting.targetUrls[0]}
-              placeholder='Enter server URL...'
-            />
+            <input type='text' placeholder='Enter server URL...' {...register('targetUrl', { required: true })} />
             <button type='button' className='toggle-target-list-button' onClick={onToggleTargetListButtonClick}>
               ▼
             </button>
             {showTargetUrls && (
               <div className='target-list-container'>
                 <ul className='target-list'>
-                  {setting.targetUrls.map((url, index) => (
-                    <li key={index}>{url}</li>
+                  {targetUrls.map((url, index) => (
+                    <li key={index} onClick={onTargetUrlListClick}>
+                      {url}
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
           </div>
-          <label htmlFor='listen-port'>Listen Port :</label>
+          <label htmlFor='listenHost'>Listen Host :</label>
+          <div className='target-url-container'>
+            <input type='text' placeholder='Enter listen host...' {...register('listenHost', { required: true })} />
+            <button type='button' className='toggle-target-list-button' onClick={onToggleListenHostListButtonClick}>
+              ▼
+            </button>
+            {showListenHost && (
+              <div className='target-list-container'>
+                <ul className='target-list'>
+                  {listenHosts.map((url, index) => (
+                    <li key={index} onClick={onListenHostListClick}>
+                      {url}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <label htmlFor='listenPort'>Listen Port :</label>
           <input
             type='number'
-            name='listen-port'
-            {...register('listenPort', {
-              valueAsNumber: true,
-            })}
-            defaultValue={setting.listenPort}
             placeholder='Enter server port...'
+            {...register('listenPort', {
+              required: true,
+              valueAsNumber: true,
+              min: 0,
+              max: 65535,
+            })}
           />
           <div className='input-checkbox-area'>
-            <label htmlFor='https'>HTTPS :</label>
-            <input type='checkbox' name='https' defaultChecked={setting.enableHttps} {...register('enableHttps')} />
+            <label htmlFor='enableHttps'>HTTPS :</label>
+            <input type='checkbox' {...register('enableHttps')} />
           </div>
           <p>
             プロキシサーバーの httpsを有効にする場合は true
@@ -98,8 +138,8 @@ function App() {
             (自己証明書を使用するためエラーになる可能性があります)
           </p>
           <div className='input-checkbox-area'>
-            <label htmlFor='ws'>WS :</label>
-            <input type='checkbox' name='ws' defaultChecked={setting.enableWs} {...register('enableWs')} />
+            <label htmlFor='enableWs'>WS :</label>
+            <input type='checkbox' {...register('enableWs')} />
           </div>
           <p>プロキシサーバーで WebSocketを使用する場合は true</p>
         </div>
@@ -113,9 +153,13 @@ function App() {
         </div>
       </form>
       <div className='server-status-container'>
-        <p className='server-status'>Server Stopped</p>
-        {errors && <span>{errors.listenHost?.message}</span>}
-        <img className='server-url-qrcode' src={qrCodeSrc} />
+        <div className='server-status'>
+          <p>{serverStatus}</p>
+          {errors.targetUrl && <p>ターゲットURLを入力してください</p>}
+          {errors.listenHost && <p>ホスト名を入力してください</p>}
+          {errors.listenPort && <p>ポートが無効な値です</p>}
+        </div>
+        <img className='server-url-qrcode' src={qrCode} />
       </div>
     </main>
   )

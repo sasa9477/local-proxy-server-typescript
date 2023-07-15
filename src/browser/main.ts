@@ -20,8 +20,8 @@ Menu.setApplicationMenu(null)
 
 const createWindow = (): void => {
   const win = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 640,
+    height: 480,
     backgroundColor: '#222222',
     show: false,
     webPreferences: {

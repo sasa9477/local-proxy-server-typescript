@@ -36,7 +36,9 @@ export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, ena
         res.write(JSON.stringify({ message: err.message }))
         res.end()
       } else {
-        res.write(JSON.stringify({ message: err.message }))
+        // WebSocket
+        const socket = res
+        socket.end(JSON.stringify({ message: err.message }))
       }
 
       console.log('Proxy server error: \n', err)
