@@ -11,5 +11,5 @@ export const useQrCode = (defaultValue?: string) => {
     setQrCode(qrCodeImage)
   }, [])
 
-  return { qrCode, convertQrCode }
+  return { qrCode, setQrCode, convertQrCode }
 }

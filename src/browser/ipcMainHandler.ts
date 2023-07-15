@@ -3,8 +3,13 @@ import { ipcChannels } from '../common/ipcChannels'
 import { loadStore, saveStore } from './lib/store'
 import { startProxyServer, stopProxyServer } from './lib/proxyServer'
 import { getHostIpAddress } from './lib/ipAddress'
+import { loadImage } from './lib/imageLoader'
 
 export const handleIpcMain = () => {
+  ipcMain.handle(ipcChannels.IMAGE_LOAD, (_event, url: string) => {
+    return loadImage(url)
+  })
+
   ipcMain.handle(ipcChannels.GET_HOST_IP_ADDRESS, async () => {
     return getHostIpAddress()
   })

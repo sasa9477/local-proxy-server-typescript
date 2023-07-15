@@ -1,7 +1,7 @@
 import { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
-import './index.css'
+import { useForm, SubmitHandler, set } from 'react-hook-form'
 import { useQrCode } from './hooks/useQrCode'
+import './index.css'
 
 type Inputs = {
   targetUrl: string
@@ -13,15 +13,12 @@ type Inputs = {
 
 function App() {
   const [running, setRunning] = useState(false)
+  const [serverStatus, setServerStatus] = useState('Server Stopped')
   const [showTargetUrls, setShowTargetUrls] = useState(false)
   const [showListenHost, setShowListenHost] = useState(false)
   const [targetUrls, setTargetUrls] = useState<string[]>([])
   const [listenHosts, setListenHosts] = useState<string[]>([])
-  const { qrCode, convertQrCode } = useQrCode()
-
-  const serverStatus = useMemo(() => {
-    return running ? 'Server Running' : 'Server Stopped'
-  }, [])
+  const { qrCode, setQrCode, convertQrCode } = useQrCode()
 
   const {
     register,
@@ -50,11 +47,13 @@ function App() {
     const serverUrl = `${data.enableHttps ? 'https' : 'http'}://${data.listenHost}:${data.listenPort}`
     convertQrCode(serverUrl)
     setRunning(true)
+    setServerStatus(`Server Running at ${serverUrl}`)
   }, [])
 
   const onStopButtonClick = useCallback(async () => {
     await window.electronAPI.stopProxyServer()
     setRunning(false)
+    setServerStatus('Server Stopped')
   }, [])
 
   const onToggleTargetListButtonClick = useCallback(() => {
@@ -81,6 +80,9 @@ function App() {
     const load = async () => {
       const ipAddress = await window.electronAPI.getHostIpAddress()
       setListenHosts((listenHosts) => [...ipAddress, ...listenHosts])
+
+      const initialQrCodeImage = await window.electronAPI.loadImage('invalid_qr_code.png')
+      setQrCode(initialQrCodeImage)
     }
     load()
   }, [])
