@@ -47,6 +47,7 @@ function App() {
     const serverUrl = `${data.enableHttps ? 'https' : 'http'}://${data.listenHost}:${data.listenPort}`
     convertQrCode(serverUrl)
     setRunning(true)
+    // TODO: httpsの場合はアイコンを表示する等、分かるようにする
     setServerStatus(`Server Running at ${serverUrl}`)
   }, [])
 
@@ -169,7 +170,7 @@ function App() {
           {errors.listenHost && <p className='error-text'>ホスト名を入力してください</p>}
           {errors.listenPort && <p className='error-text'>ポート番号が無効な値です</p>}
         </div>
-        <img className='server-url-qrcode' src={qrCode} />
+        <img className='server-url-qr-code' src={qrCode} />
       </div>
     </main>
   )

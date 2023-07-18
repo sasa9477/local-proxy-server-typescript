@@ -173,7 +173,7 @@ button:hover:not(:disabled) {
   white-space: pre-wrap;
 }
 
-.server-url-qrcode {
+.server-url-qr-code {
   display: block;
 }
 

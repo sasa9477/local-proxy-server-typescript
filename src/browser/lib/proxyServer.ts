@@ -7,14 +7,21 @@ let server: httpProxy | null = null
 
 export const stopProxyServer = () =>
   new Promise<void>((resolve) => {
-    server.close(() => {
-      server = null
-      console.log('Stopped proxy server')
-      resolve()
-    })
+    if (server !== null) {
+      server.close(() => {
+        server = null
+        console.log('Stopped proxy server')
+        resolve()
+      })
+      return
+    }
+
+    resolve()
   })
 
 export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, enableWs }: StartProxyServerArgs) => {
+  await stopProxyServer()
+
   server = httpProxy
     .createProxyServer({
       target: targetUrl,
@@ -38,11 +45,10 @@ export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, ena
       } else {
         // WebSocket
         const socket = res
-        socket.end(JSON.stringify({ message: err.message }))
+        socket.write(JSON.stringify({ message: err.message }))
       }
 
       console.log('Proxy server error: \n', err)
-      stopProxyServer()
     })
     .listen(listenPort)
 

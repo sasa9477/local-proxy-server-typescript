@@ -7,7 +7,7 @@ Store.initRenderer()
 const schema: Store.Schema<Setting> = {
   targetUrls: {
     type: 'array',
-    default: ['https://localhost:3000/', 'http://localhost:3000/'],
+    default: ['http://localhost:3000/'],
   },
   listenHosts: {
     type: 'array',
@@ -23,7 +23,7 @@ const schema: Store.Schema<Setting> = {
   },
   enableWs: {
     type: 'boolean',
-    default: false,
+    default: true,
   },
 }
 
