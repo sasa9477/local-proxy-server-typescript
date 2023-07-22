@@ -18,18 +18,19 @@ app.disableHardwareAcceleration()
 // Electronの起動を早くするため、app whenReadyよりも前に呼び出す
 Menu.setApplicationMenu(null)
 
+let win: BrowserWindow | null = null
+
 const createWindow = (): void => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 640,
     height: 500,
-    title: `Local Proxy Server ${process.env.npm_package_version || ''}`,
+
     backgroundColor: '#222222',
     show: false,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   })
-  // win.title = `Local Proxy Server ${process.env.npm_package_version || ''}`
 
   // httpから始まるリンクを 外部ブラウザで開く
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -44,12 +45,13 @@ const createWindow = (): void => {
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
   // www.electronjs.org/docs/latest/api/browser-window/#using-the-ready-to-show-event
-  win?.once('ready-to-show', () => {
-    win?.show()
+  win.once('ready-to-show', () => {
+    win.title = `Local Proxy Server ${process.env.npm_package_version || ''}`
+    win.show()
 
     if (!app.isPackaged) {
       // Open dev tools
-      win?.webContents.openDevTools()
+      win.webContents.openDevTools()
 
       console.log('electorn-store path: ', app.getPath('userData'))
     }
