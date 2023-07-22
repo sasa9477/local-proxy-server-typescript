@@ -46,7 +46,6 @@ const createWindow = (): void => {
 
   // www.electronjs.org/docs/latest/api/browser-window/#using-the-ready-to-show-event
   win.once('ready-to-show', () => {
-    win.title = `Local Proxy Server ${process.env.npm_package_version || ''}`
     win.show()
 
     if (!app.isPackaged) {
