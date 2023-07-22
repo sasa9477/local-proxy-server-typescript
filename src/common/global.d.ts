@@ -4,6 +4,7 @@ type Setting = {
   listenPort: number
   enableHttps: boolean
   enableWs: boolean
+  isNextJs12: boolean
 }
 
 type StartProxyServerArgs = Omit<Setting, 'targetUrls' | 'listenHosts'> & {

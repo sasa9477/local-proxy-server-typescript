@@ -3,13 +3,15 @@ import fs from 'fs'
 import httpProxy from 'http-proxy'
 import http from 'http'
 
-let server: httpProxy | null = null
+let proxy: httpProxy | null = null
+let proxyServer: http.Server | null = null
 
 export const stopProxyServer = () =>
   new Promise<void>((resolve) => {
-    if (server !== null) {
-      server.close(() => {
-        server = null
+    if (proxyServer !== null) {
+      proxyServer.close(() => {
+        proxyServer = null
+        proxy = null
         console.log('Stopped proxy server')
         resolve()
       })
@@ -19,10 +21,16 @@ export const stopProxyServer = () =>
     resolve()
   })
 
-export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, enableWs }: StartProxyServerArgs) => {
+export const startProxyServer = async ({
+  targetUrl,
+  listenPort,
+  enableHttps,
+  enableWs,
+  isNextJs12,
+}: StartProxyServerArgs) => {
   await stopProxyServer()
 
-  server = httpProxy
+  proxy = httpProxy
     .createProxyServer({
       target: targetUrl,
       ssl: enableHttps
@@ -33,7 +41,7 @@ export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, ena
         : false,
       // see https://github.com/http-party/node-http-proxy/issues/1083.
       secure: false,
-      ws: enableWs,
+      // ws: enableWs,
       changeOrigin: true,
       autoRewrite: true,
     })
@@ -49,6 +57,19 @@ export const startProxyServer = async ({ targetUrl, listenPort, enableHttps, ena
       }
 
       console.log('Proxy server error: \n', err)
+    })
+
+  proxyServer = http
+    .createServer(function (req, res) {
+      proxy.web(req, res)
+    })
+    .on('upgrade', function (req, socket, head) {
+      if (enableWs) {
+        if (isNextJs12 && !req.url.startsWith('/_next/webpack-hmr')) {
+          return
+        }
+        proxy.ws(req, socket, head)
+      }
     })
     .listen(listenPort)
 

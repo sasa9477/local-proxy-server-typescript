@@ -25,6 +25,10 @@ const schema: Store.Schema<Setting> = {
     type: 'boolean',
     default: true,
   },
+  isNextJs12: {
+    type: 'boolean',
+    default: false,
+  },
 }
 
 const store = new Store({ schema })

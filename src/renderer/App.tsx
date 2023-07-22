@@ -1,5 +1,6 @@
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
+import { Tooltip } from 'react-tooltip'
 import { useQrCode } from './hooks/useQrCode'
 import './index.css'
 
@@ -9,6 +10,7 @@ type Inputs = {
   listenPort: number
   enableHttps: boolean
   enableWs: boolean
+  isNextJs12: boolean
 }
 
 function App() {
@@ -36,6 +38,7 @@ function App() {
         listenPort: setting.listenPort,
         enableHttps: setting.enableHttps,
         enableWs: setting.enableWs,
+        isNextJs12: setting.isNextJs12,
       }
     },
   })
@@ -153,6 +156,23 @@ function App() {
             <input type='checkbox' {...register('enableWs')} />
           </div>
           <p>プロキシサーバーで WebSocketを使用する場合は true</p>
+          <div className='input-checkbox-area'>
+            <label htmlFor='isNextJs12'>WS :</label>
+            <input type='checkbox' {...register('isNextJs12')} />
+          </div>
+          <p>
+            Next12で WebSocketを使用する場合は true
+            <a
+              className='info-icon'
+              data-tooltip-id='see-next12-issue'
+              data-tooltip-content='see https://github.com/vercel/next.js/issues/30491#issuecomment-962835174'
+              href='https://github.com/vercel/next.js/issues/30491#issuecomment-962835174'
+              target='_blank'
+            >
+              i
+            </a>
+          </p>
+          <Tooltip id='see-next12-issue' variant='info' />
         </div>
         <div className='button-area'>
           <button type='submit' disabled={running}>

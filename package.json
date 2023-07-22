@@ -1,6 +1,6 @@
 {
   "name": "local-proxy-server-typescript",
-  "productName": "local-proxy-server-typescript",
+  "productName": "Local Proxy Server",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".webpack/main",
@@ -13,7 +13,7 @@
   },
   "keywords": [],
   "author": {
-    "name": "Sasada",
+    "name": "Sasa",
     "email": "sasa9477@outlook.com"
   },
   "license": "MIT",
@@ -51,6 +51,7 @@
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.45.1"
+    "react-hook-form": "^7.45.1",
+    "react-tooltip": "^5.18.1"
   }
 }
