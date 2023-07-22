@@ -157,11 +157,11 @@ function App() {
           </div>
           <p>プロキシサーバーで WebSocketを使用する場合は true</p>
           <div className='input-checkbox-area'>
-            <label htmlFor='isNextJs12'>WS :</label>
+            <label htmlFor='isNextJs12'>Next12 :</label>
             <input type='checkbox' {...register('isNextJs12')} />
           </div>
           <p>
-            Next12で WebSocketを使用する場合は true
+            NextJs 12で WebSocketを使用する場合は true
             <a
               className='info-icon'
               data-tooltip-id='see-next12-issue'

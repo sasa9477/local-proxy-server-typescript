@@ -2,9 +2,11 @@ import path from 'path'
 import fs from 'fs'
 import httpProxy from 'http-proxy'
 import http from 'http'
+import { Socket } from 'node:net'
 
 let proxy: httpProxy | null = null
 let proxyServer: http.Server | null = null
+const connections: Record<string, Socket> = {}
 
 export const stopProxyServer = () =>
   new Promise<void>((resolve) => {
@@ -14,6 +16,9 @@ export const stopProxyServer = () =>
         proxy = null
         console.log('Stopped proxy server')
         resolve()
+      })
+      Object.values(connections).forEach((connection) => {
+        connection.destroy()
       })
       return
     }
@@ -57,6 +62,7 @@ export const startProxyServer = async ({
       }
 
       console.log('Proxy server error: \n', err)
+      stopProxyServer()
     })
 
   proxyServer = http
@@ -64,12 +70,21 @@ export const startProxyServer = async ({
       proxy.web(req, res)
     })
     .on('upgrade', function (req, socket, head) {
+      console.log('upgrade', req.url)
       if (enableWs) {
         if (isNextJs12 && !req.url.startsWith('/_next/webpack-hmr')) {
           return
         }
         proxy.ws(req, socket, head)
       }
+    })
+    .on('connection', (connection) => {
+      const key = `${connection.remoteAddress}`
+      console.log('New connection: ', key)
+      // connections[key] = connection
+      // connection.on('close', () => {
+      //   delete connections[key]
+      // })
     })
     .listen(listenPort)
 

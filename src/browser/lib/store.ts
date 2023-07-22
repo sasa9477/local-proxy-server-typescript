@@ -7,7 +7,7 @@ Store.initRenderer()
 const schema: Store.Schema<Setting> = {
   targetUrls: {
     type: 'array',
-    default: ['http://localhost:3000/'],
+    default: ['http://127.0.0.1:3000/', 'http://localhost:3000/'],
   },
   listenHosts: {
     type: 'array',
@@ -48,10 +48,18 @@ const unshiftArray = (array: Array<string>, value: string) => {
   return targetArray.slice(0, SAVING_TARGET_URL_LIMIT)
 }
 
-export const saveStore = ({ targetUrl, listenHost, listenPort, enableHttps, enableWs }: StartProxyServerArgs) => {
+export const saveStore = ({
+  targetUrl,
+  listenHost,
+  listenPort,
+  enableHttps,
+  enableWs,
+  isNextJs12,
+}: StartProxyServerArgs) => {
   store.set('listenPort', listenPort)
   store.set('enableHttps', enableHttps)
   store.set('enableWs', enableWs)
+  store.set('isNextJs12', isNextJs12)
 
   const targetUrls = store.get('targetUrls')
   store.set('targetUrls', unshiftArray(targetUrls, targetUrl))
