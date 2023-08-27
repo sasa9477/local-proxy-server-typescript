@@ -10,6 +10,9 @@ https://learn.microsoft.com/ja-jp/windows/wsl/networking#accessing-a-wsl-2-distr
 
 ### 構築手順
 
+rpm モジュールをインストールします。  
+`sudo apt install rpm`
+
 mkcert を scoop からインストールします。  
 レポジトリの ディレクトリ内で localhost の SSL 証明書を発行します。  
 `yarn make` コマンドで ビルドすると out フォルダーに 実行ファイル(.exe)と セットアップ実行ファイル(Setup.exe)が作成されます。  
